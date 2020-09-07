@@ -280,38 +280,52 @@ lastIndexOf(String str, int fromIndex);//同上，从指定位置查找
 
 # 集合
 
-## map
-
-方法：put, get, getOrDefault, containsKey, containsValue, keySet, values, isEmpty, size
+## Collection接口
 
 ```java
-import java.util.HashMap; 
-import java.util.Iterator; 
-import java.util.Map;
+ollection的定义如下：
+public interface Collection<E> extends Iterable<E> {}
+基础API接口：
 
-public class TestMap { 
-        public static void main(String[] args) { 
-                Map<String, String> map = new HashMap<String, String>(); 
-                map.put("1", "a"); 
-                map.put("2", "b"); 
-                map.put("3", "c"); 
- 
-                //最简洁、最通用的遍历方式 
-                for (Map.Entry<String, String> entry : map.entrySet()) { 
-                        System.out.println(entry.getKey() + " = " + entry.getValue()); 
-                } 
-          
-          //.keySet();    // 返回一个Set,这个Set中包含Map中所有的Key --- O(1)
-          for (Character key : map.keySet()) {
-    			// Operate with each key
-					}
-          //.values();    // 返回一个Collection<v>,里面全是对应的每一个value --- O(1)
-          for (Integer value : map.values()) {
-    			// Operate with each values
-					}
-        }
-}
+abstract boolean         add(E object)
+abstract boolean         addAll(Collection<? extends E> collection)
+abstract void            clear()
+abstract boolean         contains(Object object)
+abstract boolean         isEmpty()
+abstract boolean         remove(Object object)
+abstract boolean         removeAll(Collection<?> collection)
+abstract int             size()
+abstract <T> T[]         toArray(T[] array)
+abstract Object[]        toArray()
 ```
+
+
+
+## list
+
+```java
+List的定义如下：
+public interface List<E> extends Collection<E> {}
+
+// 相比与Collection，List新增的API：location 就是索引
+
+abstract void                add(int location, E object)
+abstract boolean             addAll(int location, Collection<? extends E> collection)
+abstract E                   get(int location)
+abstract int                 indexOf(Object object)     //获取对象的第一个索引
+abstract int                 lastIndexOf(Object object) //获取对象的最后一个索引
+abstract E                   remove(int location)
+abstract E                   set(int location, E object)
+abstract List<E>             subList(int start, int end)
+```
+
+ArrayList是动态数组	
+
+`public class ArrayList<E> extends AbstractList<E> implements List<E>, RandomAccess, Cloneable, java.io.Serializable`
+
+LinkedList 是双向链表，是 Deque(Queue)的子类
+
+`public class LinkedList<E> extends AbstractSequentialList<E> implements List<E>, Deque<E>, Cloneable, java.io.Serializable`
 
 ## queue
 
@@ -347,7 +361,17 @@ public class TestQueue {
 
 ## stack
 
-方法：push, pop, peek, isEmpty, size
+Stack 是Vector的子类，方法：
+
+```java
+push( num)   //入栈
+pop()   //栈顶元素出栈 返回
+empty()   //判定栈是否为空     注意这里和Collection的区别
+peek()   //获取栈顶元素
+search(num)  //栈顶到该元素首次出现的位置的距离
+```
+
+
 
 ```java
 import java.util.Stack; 
@@ -377,6 +401,68 @@ public class TestStack {
 }
 ```
 
+## queue
+
+Queue 和List 属于同一级，都继承了Collection
+
+```java
+//add()和remove()，element()方法在失败的时候会抛出异常(不推荐) 
+Queue<String> queue = new LinkedList<String>();
+
+offer(object)
+poll() // 出队并返回
+peek() 
+```
+
+双端队列`Deque<E> queue = new ArrayDeque<E>();`
+
+- LinkedList 大小可变的链表双端队列，允许元素为插入null。线程不安全
+- ArrayDeque 大下可变的数组双端队列，不允许插入null。线程不安全
+- ConcurrentLinkedDeque 大小可变且线程安全的链表双端队列，非阻塞，不允许插入null。
+- LinkedBlockingDeque 为线程安全的双端队列，在队列为空的情况下，获取操作将会阻塞，直到有元素添加。
+
+![image-20200907091202486](https://i.loli.net/2020/09/07/caxkuCvlLj2M4nV.png)
+
+
+
+## PriorityQueue (Heap)
+
+优先队列 , 是Queue接口的实现，可以对其中元素进行排序(默认升序)，对于自己定义的类来说，需要自己定义比较器
+
+底层是一颗数， 以小根堆为例
+
+初始化
+
+```java
+//小根堆
+Queue<Integer> minH = new PriorityQueue<>();    // 小根堆，默认大小为11 相当于  new PriorityQueue<>(11)
+Queue<Integer> minH = new PriorityQueue<>(100);  // 定义一个默认容量有100的小根堆。在当中增加元素会扩容，只是开始指定大小。不是size，是capacity
+
+//大根堆
+Queue<Integer> maxH = new PriorityQueue<>((i1, i2) -> i2 - i1);    // 大根堆，默认大小为11 相当于  new PriorityQueue<>(11, (i1, i2) -> i2 - i1)
+Queue<Integer> maxH = new PriorityQueue<>(100, (i1, i2) -> i2 - i1);    // 定义一个默认容量有100的大根堆。在当中增加元素会扩容，只是开始指定大小
+```
+
+
+
+```java
+//定义类cmp,制定排序规则  降序      a-b > 0 升序  a-b<0 降序   
+class cmp implements Comparator<a>{         
+    public int compare(a A, a B) {
+        if(A.n > B.n)return -1;
+        if(A.n == B.n)return 0;
+        if(A.n < B.n)return 1;
+        return 0;
+    }
+}
+//或者直接在初始化时指定规则
+PriorityQueue<int[]> minHeap = new PriorityQueue<>((a, b) -> (b[0] - a[0]));
+```
+
+方法：offer, poll, peek, isEmpty, size, 遍历方式一样可以用for 迭代器
+
+
+
 ## hashset
 
 初始化
@@ -390,7 +476,9 @@ Set<Integer> set = new HashSet<>(list);
 
 方法：add, remove, contains, isEmpty, size
 
-# treeset
+## treeset
+
+元素按照自然排序进行排列
 
 ```java
  // 顺序遍历TreeSet
@@ -409,25 +497,79 @@ Set<Integer> set = new HashSet<>(list);
     }
 ```
 
+可以定义 比较器
 
+`TreeSet(Comparator<? super E> comparator) // 指定TreeSet的比较器`
 
-## 优先队列 PriorityQueue (Heap)
+## map
 
-底层是一颗数， 以小根堆为例
-
-初始化
+方法：put, get, getOrDefault, containsKey, containsValue, keySet, values, isEmpty, size
 
 ```java
-//小根堆
-Queue<Integer> minH = new PriorityQueue<>();    // 小根堆，默认大小为11 相当于  new PriorityQueue<>(11)
-Queue<Integer> minH = new PriorityQueue<>(100);  // 定义一个默认容量有100的小根堆。在当中增加元素会扩容，只是开始指定大小。不是size，是capacity
+public Object put(Object key,Object value)   //增添元素
+public Object remove(Object key)           //删除元素,并返回键对应的值
+public Object get(Object key)             //获取键对应的值
+public boolean containsKey(Object key)  //判断指定键是否存在
+public boolean containsValue(Object value) //判断指定值是否存在
+ 
+put(n, m.getOrDefault(n, 0) + 1);
 
-//大根堆
-Queue<Integer> maxH = new PriorityQueue<>((i1, i2) -> i2 - i1);    // 大根堆，默认大小为11 相当于  new PriorityQueue<>(11, (i1, i2) -> i2 - i1)
-Queue<Integer> maxH = new PriorityQueue<>(100, (i1, i2) -> i2 - i1);    // 定义一个默认容量有100的大根堆。在当中增加元素会扩容，只是开始指定大小
+//获取键、值、元素集合
+public Collection values() //获取值集合
+public Set KeySet()  //获取键集合
+public Set entrySet() //获取元素集合
 ```
 
-方法：offer, poll, peek, isEmpty, size
+
+
+Map 接口没有提供 iterator() 方法，其子接口 Entry 提供了 iterator() 方法，并且提供了获取键、值的方法
+
+```java
+import java.util.HashMap; 
+import java.util.Iterator; 
+import java.util.Map;
+
+public class TestMap { 
+    public static void main(String[] args) { 
+        Map<String, String> map = new HashMap<String, String>(); 
+
+        map.put("1", "a"); 
+        map.put("2", "b"); 
+        map.put("3", "c"); 
+
+        // 1.	Entry<K,T> 遍历 可以取到每一个key和value
+        for(Map.Entry<String, String> entry : map.entrySet()){
+            String mapKey = entry.getKey();
+            String mapValue = entry.getValue();
+            System.out.println(mapKey+":"+mapValue);
+        }
+
+        //2.	只用key 或者只用 value
+
+        //key
+        for(String key : map.keySet()){
+            System.out.println(key);
+        }
+        //value
+        for(String value : map.values()){
+            System.out.println(value);
+        }
+	}
+}
+```
+
+## treemap
+
+比Map多的接口
+
+```java
+1.	Object firstKey（）：它返回树映射中当前的第一个（最少）键。
+2.	Object lastKey（）：它返回树映射中当前的最后一个（最大）键。
+3.	Object ceilingKey（Object key）：返回大于或等于给定键的最小键，如果没有这样的键返回null。
+4.	Object higherKey（Object key）：返回严格大于指定键的最小键。
+```
+
+
 
 # 数组
 
@@ -444,22 +586,23 @@ int[][] c = new int[10][10];
 
 `.length` *记得是属性而不是方法 `arr.length` 没有()*
 
- Arrays.sort从小到大排序
-
 ```java
-Arrays.sort(int[] arr)	//从小到大排序
-Arrays.sort(int[] arr, int fromIndex, int toIndex) // [)
-Arrays.sort(int[] arr, int fromIndex, int toIndex, 比较器); //一定是需要泛型
-Arrays.sort(arr, (o1, o2) -> o2 - o1); //数组全部 从大到小排序 跟Collections.sort()一样
+//静态方法
+Arrays.asList(Object[] a) 数组a 转换成 List 
+public static int binarySearch(Object[] a, Object key) //二分查找（a已排序）
+public static boolean equals(Object[] a, Object[] a2)  //判断两数组是否完全一致
+public static void fill(Object[] a, Object val)   //在a中所有位置填充val
+
+//在[fromIndex,toIndex)中填充val
+public static void fill(Object[] a, int fromIndex, int toIndex, Object val) 
+public static String toString(Object[] a) //将数组a转换为字符串，如"[1, 2, 3]"
+public static void sort(Object[] a) //改进的快速排序（升序）
+public static void sort(Object[] a, int fromIndex, int toIndex) //对[fromIndex,toIndex)升序排序
+public static <T> void sort(T[] a, Comparator<? super T> c) //自定义比较器排序
 Arrays.sort(arr, 0, 3, (o1, o2) -> o2 - o1); //从大到小排序，只排序[0, 3)
-
 ```
-Arrays.fill填满一个数组
 
-```java
-int[] a = new int[5];
-Arrays.fill(a, 1);
-```
+
 
 Arrays.copyOf / arr.clone()复制一个数组(二维数组也可以)
 
@@ -515,10 +658,21 @@ list.remove(list.size() - 1);
 .subList(int from, int to)    // 相当于返回原数组的一个片段,但不要对其进行改动，改动会影响原数组
 ```
 
-`Collections.sort(list);` 从小到大排序
-`Collections.sort(list, (o1, o2) -> o2 - o1);` 从大到小排序， 第二个参数为一个比较器
 
 
+#### Collections 类对List对象提供的方法
+
+```java
+public static int binarySearch(List list, Object key) //查找元素
+public static void copy(List dest, List src)   //将src复制给dest
+public static void fill(List list, Object obj) //在list中填充obj
+public static void reverse(List list)  //列表元素倒置
+public static void sort(List list) //升序排序
+public static <T> void sort(List<T> list, Comparator<? super T> c) //自定义比较器排序
+```
+
+`Collections.sort(list);` 升序
+`Collections.sort(list, (o1, o2) -> o2 - o1);` 降序， 第二个参数为一个比较器
 
 # Math
 
@@ -545,3 +699,30 @@ int a = (int)(Math.random()*b + 1); // [1, b]
 int a = (int)(Math.random()*(b - a + 1) + a);	//[a, b]
 ```
 
+# dp
+```java
+#include<iostream>
+using namespace std;
+ 
+int main() {
+    int x, y, n;
+    cin >> x >> y >> n;
+    long long int dp[30 + 1][30 + 1] = {0};
+    for (int i = 0; i < n; i++) {
+        int x, y;
+        cin >> x >> y;
+        dp[x][y] = -1;
+    }
+    for (int i = 0;i <= x;i ++) dp[i][0] = 1;
+    for (int j = 0;j <= y;j ++) dp[0][j] = 1;
+    for (int i = 1; i <= x; i++) {
+        for (int j = 1; j <= y; j++) {
+            if (dp[i][j] == -1) continue;
+            if (dp[i - 1][j] != -1) dp[i][j] += dp[i - 1][j];
+            if (dp[i][j - 1] != -1) dp[i][j] += dp[i][j - 1];
+        }
+    }
+    cout << dp[x][y] << endl;
+    return 0;
+}
+```
